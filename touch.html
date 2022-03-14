@@ -16,9 +16,9 @@
       ctx = canvas.getContext("2d");
 
       //resize canvas for full screen
-
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
+             resizeCanvas();
+    //  canvas.style.width = window.innerWidth + "px";
+    //  canvas.style.height = window.innerHeight + "px";
     }
 
     function draw(e) {
@@ -61,10 +61,26 @@ function toggleFullScreen() {
   }
 }
 
+window.addEventListener('resize', resizeCanvas, false);
+
+       function resizeCanvas() {
+               canvas.width = window.innerWidth;
+               canvas.height = window.innerHeight;
+
+       }
+
   </script>
+
+  <style>
+
+  canvas {
+    background: #eee;
+}
+</style>
+
   </head>
   <body onload="init()">
-    <canvas id="mycanvas" height="500px" width="500px">
+    <canvas id="mycanvas" >
       Canvas element not supported.
     </canvas>
   </body>
