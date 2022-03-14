@@ -14,6 +14,11 @@
       touchzone.addEventListener("touchend", end, false);
       canvas = document.getElementById('mycanvas');
       ctx = canvas.getContext("2d");
+
+      //resize canvas for full screen
+
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
     }
 
     function draw(e) {
@@ -43,6 +48,18 @@
       delete lastPt[id];
     }
   }
+
+
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
 
   </script>
   </head>
