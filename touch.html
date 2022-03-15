@@ -3,22 +3,76 @@
   <head>
   <title>HTML5 multi-touch</title>
   <script type='text/javascript'>
+
+  //https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
+//https://mobiforge.com/design-development/html5-mobile-web-touch-events
+
     var canvas;
     var ctx;
     var lastPt = new Object();
     var colours = ['red', 'green', 'blue', 'yellow', 'black'];
+    var ongoingTouches = [];
+
+    var leftIsDown = false;
+    var rightIsDown = false;
+
+    var leftMouseIsDown = false;
+    var rightMouseIsDown = false;
+
+    let leftTxt;
+    let rightTxt;
+
+    let leftCount = 0;
+    let rightCount = 0;
+
+    let timer;
+    var totalSeconds = 0;
+
+    var intTimer;
+
+    let successSound = new Audio('./audio/success.mp3');
+    let success2Sound = new Audio('./audio/success.mp3');
 
     function init() {
       var touchzone = document.getElementById("mycanvas");
+      touchzone.addEventListener("touchstart", start, false);
       touchzone.addEventListener("touchmove", draw, false);
       touchzone.addEventListener("touchend", end, false);
       canvas = document.getElementById('mycanvas');
       ctx = canvas.getContext("2d");
 
+      rightTxt = document.querySelector('#rightTxt');
+      leftTxt = document.querySelector('#leftTxt');
+      timer = document.getElementById("timer");
       //resize canvas for full screen
-             resizeCanvas();
-    //  canvas.style.width = window.innerWidth + "px";
-    //  canvas.style.height = window.innerHeight + "px";
+      resizeCanvas();
+    }
+
+    function start(e) {
+      e.preventDefault();
+      var touches = e.changedTouches;
+
+      for (var i = 0; i < touches.length; i++) {
+        // console.log("touchstart:" + i + "...");
+        var id = touches[i].identifier;
+          ctx.fillStyle = "black";
+         ctx.beginPath();
+         ctx.arc(touches[i].pageX, touches[i].pageY, 4, 0, 2 * Math.PI, false);  // a circle at the start
+         ctx.fill();
+         console.log("touchstart:" + i + ".");
+
+         if(e.changedTouches[i].pageX < canvas.width/2){
+           leftMouseDown();
+         }else{
+           rightMouseDown();
+         }
+
+         // Store last point
+         lastPt[id] = {x:touches[i].pageX, y:touches[i].pageY};
+
+        }
+
+
     }
 
     function draw(e) {
@@ -28,22 +82,35 @@
       for(var i=0;i<e.touches.length;i++) {
         var id = e.touches[i].identifier;
         if(lastPt[id]) {
+
           ctx.beginPath();
           ctx.moveTo(lastPt[id].x, lastPt[id].y);
           ctx.lineTo(e.touches[i].pageX, e.touches[i].pageY);
-          ctx.strokeStyle = colours[id];
+          //ctx.strokeStyle = colours[id];
+          if(lastPt[id].x < canvas.width/2){
+            ctx.strokeStyle = colours[0];
+          }else{
+            ctx.strokeStyle = colours[1];
+          }
           ctx.stroke();
 
         }
         // Store last point
         lastPt[id] = {x:e.touches[i].pageX, y:e.touches[i].pageY};
       }
+
   }
 
   function end(e) {
     e.preventDefault();
     for(var i=0;i<e.changedTouches.length;i++) {
       var id = e.changedTouches[i].identifier;
+
+        if(lastPt[id].x < canvas.width/2){
+          leftMouseUp();
+        }else{
+          rightMouseUp();
+        }
       // Terminate this touch
       delete lastPt[id];
     }
@@ -63,19 +130,121 @@ function toggleFullScreen() {
 
 window.addEventListener('resize', resizeCanvas, false);
 
-       function resizeCanvas() {
-               canvas.width = window.innerWidth;
-               canvas.height = window.innerHeight;
+function resizeCanvas() {
+         canvas.width = window.innerWidth;
+         canvas.height = window.innerHeight;
 
-       }
+ }
+ function leftMouseDown(event) {
+
+   leftMouseIsDown = true;
+   leftCount +=1;
+   leftTxt.innerHTML = leftCount;
+   if (leftCount ==3){
+     leftCount =0;
+     successSound.play();
+   }
+   ctx.fillStyle = "LightBlue";
+   ctx.fillRect(window.innerWidth/8, window.innerWidth/8, window.innerWidth/4, window.innerWidth/4);
+
+   if (rightMouseIsDown) {
+     intTimer = setInterval(setTime, 1000);
+  }
+ }
+
+ function leftMouseUp(event) {
+   leftMouseIsDown = false;
+   leftTxt.innerHTML = leftCount;
+   clearInterval(intTimer);
+   timer.innerHTML ="";
+   totalSeconds =0;
+
+   ctx.fillStyle = "Cornsilk";
+   ctx.fillRect(window.innerWidth/8, window.innerWidth/8, window.innerWidth/4, window.innerWidth/4);
+
+ }
+
+ function rightMouseDown(event) {
+
+   rightMouseIsDown = true;
+   rightCount +=1;
+   rightTxt.innerHTML = rightCount;
+   if (rightCount ==3){
+     success2Sound.play();
+     rightCount =0;
+   }
+
+   ctx.fillStyle = "LightBlue";
+ctx.fillRect((window.innerWidth/8)*5, window.innerWidth/8, window.innerWidth/4, window.innerWidth/4);
+
+ }
+
+ function rightMouseUp(event) {
+   rightMouseIsDown = false;
+   rightTxt.innerHTML = rightCount;
+   ctx.fillStyle = "Cornsilk";
+ctx.fillRect((window.innerWidth/8)*5, window.innerWidth/8, window.innerWidth/4, window.innerWidth/4);
+ }
+
+ function setTime() {
+   ++totalSeconds;
+   timer.innerHTML = totalSeconds ;
+
+   if ( totalSeconds == 3 ){
+     clearInterval(intTimer);
+     timer.innerHTML ="<div id='charm'>&#129409</div>";
+     totalSeconds=0;
+     successSound.play();
+   }
+ }
+
 
   </script>
 
   <style>
 
+html,body,canvas,div{
+  margin:0;
+  padding: 0;
+}
   canvas {
     background: #eee;
+
 }
+
+#leftTxt{
+
+  position: absolute;
+  top:50%;
+  left: 25%;
+
+}
+
+#rightTxt{
+
+  position: absolute;
+  top:50%;
+  right: 25%;
+
+}
+
+#timer{
+
+  position: absolute;
+  top:50%;
+  right: 50%;
+
+}
+
+#charm{
+
+  font-size:100px;
+  position: absolute;
+  top:-50px;
+  left:-50px;
+
+}
+
 </style>
 
   </head>
@@ -83,5 +252,8 @@ window.addEventListener('resize', resizeCanvas, false);
     <canvas id="mycanvas" >
       Canvas element not supported.
     </canvas>
+    <div id="leftTxt" >Left</div>
+    <div id="rightTxt" > Right</div>
+    <div id="timer">0</div>
   </body>
 </html>
