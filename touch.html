@@ -2,6 +2,9 @@
 <html>
   <head>
   <title>HTML5 multi-touch</title>
+
+  <link rel="manifest" href="manifest.json">
+
   <script type='text/javascript'>
 
   //https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
@@ -71,6 +74,7 @@
          lastPt[id] = {x:touches[i].pageX, y:touches[i].pageY};
 
         }
+        openFullscreen();
 
 
     }
@@ -203,6 +207,16 @@ ctx.fillRect((window.innerWidth/8)*5, window.innerWidth/8, window.innerWidth/4, 
      successSound.play();
    }
  }
+
+ function openFullscreen() {
+  if (canvas.requestFullscreen) {
+    canvas.requestFullscreen();
+  } else if (canvas.webkitRequestFullscreen) { /* Safari */
+    canvas.webkitRequestFullscreen();
+  } else if (canvas.msRequestFullscreen) { /* IE11 */
+    canvas.msRequestFullscreen();
+  }
+}
 
 
   </script>
