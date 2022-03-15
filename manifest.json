@@ -3,9 +3,10 @@
   "name": "HMD IPD TEST",
   "short_name": "IPD Test",
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#eee",
   "description": "Test the merge HMD IPD feature",
+  "orientation": "landscape",
   "icons": [{
     "src": "images/homescreen192.png",
     "sizes": "192x192",
